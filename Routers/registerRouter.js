@@ -6,7 +6,7 @@ const userModel = require('../Models/userModel.js');
 router.post('/signup', async (req, res) => {
     try {
         const signupUser = new userModel(req.body);
-        const errors = signupUser.validateUser();
+        const errors = signupUser.validateSignUpUser();
 
         if (errors)
             return res.status(400).send(errors);

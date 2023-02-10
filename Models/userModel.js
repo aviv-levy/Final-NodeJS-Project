@@ -1,25 +1,36 @@
 const JOI = require("joi");
 const userModelScheme = require('./userModelScheme');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 class userModel {
 
     constructor(object) {
-        this.id = object.id;
         this.name = object.name;
         this.email = object.email;
         this.password = object.password;
         this.biz = object.biz;
     }
-    //Validate user value by JOI
-    validateUser() {
+    //Validate new user value by JOI
+    validateSignUpUser() {
 
         const userSchema = JOI.object({
-            id: JOI.number().min(1),
             name: JOI.string().min(2).max(40).pattern(new RegExp(/^[a-zA-Z]+ [a-zA-Z]+$/)),
+            email: JOI.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required(),
+            password: JOI.string().min(6).max(30).required(),
+            biz: JOI.boolean()
+        });
+
+        const result = userSchema.validate(this, { abortEarly: false });
+
+        return result.error ? result.error : null;
+    }
+
+    //Validate login user value by JOI
+    validateSignInUser() {
+        const userSchema = JOI.object({
             email: JOI.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
             password: JOI.string().min(6).max(30),
-            biz: JOI.boolean()
         });
 
         const result = userSchema.validate(this, { abortEarly: false });
@@ -29,20 +40,41 @@ class userModel {
 
     //Save new user to database.
     async saveUser() {
+        try {
+            const user = new userModelScheme({
+                name: this.name,
+                email: this.email,
+                password: await bcrypt.hash(this.password, 10),
+                biz: false
+            })
+            await user.save();
+        } catch (err) {
 
-        const user = new userModelScheme({
-            id: this.id,
-            name: this.name,
-            email: this.email,
-            password: await bcrypt.hash(this.password,10),
-            biz: this.biz
-        })
-        await user.save();
+        }
     }
 
+    //Return token if succeed to login
+    async signIn() {
 
-    async signInUser() {
-        return await userModelScheme.findOne({ email: this.email });
+        try {
+            const user = await userModelScheme.findOne({ email: this.email });
+            if (await bcrypt.compare(this.password, user.password.toString())) {
+                return jwt.sign({ id: user.id, biz: user.biz }, process.env.SECRET, { expiresIn: '15m' });
+            }
+            return false;
+        } catch (err) {
+
+        }
+    }
+
+    async findUserInfoById() {
+        try {
+            const user = await userModelScheme.findOne({ id: this.id }).lean() ;
+            delete user.password;
+            return user;
+        } catch (err) {
+
+        }
     }
 }
 

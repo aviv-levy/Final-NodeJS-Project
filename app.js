@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 
 const registerRouter = require('./Routers/registerRouter.js')
 const loginRouter = require('./Routers/loginRouter.js')
+const homepageRouter = require('./Routers/homepageRouter.js')
 
 app.use(bodyParser.json())
 
@@ -28,6 +29,7 @@ main();
 
 app.use('/register', registerRouter)
 app.use('/login', loginRouter)
+app.use('/homepage', homepageRouter)
 
 app.listen(port, () => {
     console.log('Server is running...');
