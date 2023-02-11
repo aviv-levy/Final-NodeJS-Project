@@ -7,13 +7,13 @@ const userModel = require('../Models/userModel.js');
 router.post('/signin', async (req, res) => {
     try {
         const signInUser = new userModel(req.body);
-        const errors = signInUser.validateSignUpUser();
+        const errors = signInUser.validateSignInUser();
 
         if (errors)
             return res.status(400).send(errors);
 
         const token = await signInUser.signIn();
-        token ? res.status(200).cookie('token',token).send('Logged In') : res.status(403).send('Not authorized');
+        token ? res.status(200).cookie('token',token).send('Logged In: '+ token) : res.status(403).send('Not authorized');
     } catch (err) {
         res.status(500).send(err.message);
     }

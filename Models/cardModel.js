@@ -1,6 +1,5 @@
 const JOI = require("joi");
 const cardModelScheme = require('./cardModelScheme');
-const jwt = require('jsonwebtoken');
 
 class cardModel {
 
@@ -13,16 +12,16 @@ class cardModel {
     }
 
         //Validate new card values by JOI
-        validateNewCard() {
+        validateCard() {
 
             const cardSchema = JOI.object({
-                buissenes_Name: JOI.string().min(2).max(40).pattern(new RegExp(/^[a-zA-Z]+ [a-zA-Z]+$/)),
+                buissenes_Name: JOI.string().min(2).max(40).pattern(new RegExp(/^[a-zA-Z]+ [a-zA-Z]+$/)).required(),
                 address: JOI.string().min(4).max(50).required(),
-                phone: JOI.string().min(10).max(23).pattern(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/),
-                picture: JOI.string().min(10),
+                phone: JOI.string().min(10).max(23).pattern(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/).required(),
+                picture: JOI.string().min(10).required(),
                 user_id:JOI.string().min(2).max(30).required()
             });
-    
+
             const result = cardSchema.validate(this, { abortEarly: false });
     
             return result.error ? result.error : null;

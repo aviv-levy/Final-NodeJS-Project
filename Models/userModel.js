@@ -15,7 +15,7 @@ class userModel {
     validateSignUpUser() {
 
         const userSchema = JOI.object({
-            name: JOI.string().min(2).max(40).pattern(new RegExp(/^[a-zA-Z]+ [a-zA-Z]+$/)),
+            name: JOI.string().min(2).max(40).pattern(new RegExp(/^[a-zA-Z]+ [a-zA-Z]+$/)).required(),
             email: JOI.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required(),
             password: JOI.string().min(6).max(30).required(),
             biz: JOI.boolean()
@@ -29,8 +29,10 @@ class userModel {
     //Validate login user value by JOI
     validateSignInUser() {
         const userSchema = JOI.object({
-            email: JOI.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
-            password: JOI.string().min(6).max(30),
+            name: JOI.string(),
+            email: JOI.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required(),
+            password: JOI.string().min(6).max(30).required(),
+            biz: JOI.boolean()
         });
 
         const result = userSchema.validate(this, { abortEarly: false });

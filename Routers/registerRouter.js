@@ -13,7 +13,7 @@ router.post('/signup', async (req, res) => {
 
         await signupUser.saveUser();
 
-        res.status(201).send();
+        res.status(201).send('New user created');
     } catch (err) {
         res.status(500).send(err.message);
     }
